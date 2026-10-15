@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="mr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#14532d">
+<title>Marathi2India AI Translator</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{font-family:system-ui,-apple-system,"Noto Sans Devanagari",sans-serif;color:#17211b;background:#f3f7f3}
+*{box-sizing:border-box}body{margin:0}header{background:#14532d;color:white;padding:22px 16px 18px}
+h1{font-size:1.35rem;margin:0 0 6px}header p{margin:0;opacity:.9;font-size:.92rem}
+main{max-width:760px;margin:auto;padding:16px}.card{background:white;border:1px solid #dce7dd;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 3px 14px #1231}
+label{display:block;font-weight:650;margin:0 0 7px}select,textarea,input{width:100%;font:inherit;border:1px solid #bdcbbf;border-radius:10px;padding:11px;background:white}
+textarea{min-height:135px;resize:vertical} .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button{font:inherit;font-weight:650;border:0;border-radius:10px;padding:12px 14px;cursor:pointer}
+.primary{background:#166534;color:white;width:100%;margin-top:12px}.secondary{background:#e5efe6;color:#174526}.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.row button{flex:1}
+#status{font-size:.9rem;margin-top:10px;color:#43564a;white-space:pre-wrap}#output{min-height:125px;background:#f9fbf9}
+.small{font-size:.82rem;color:#5b6c60;line-height:1.45}.notice{background:#fff7df;border:1px solid #eed99a;border-radius:12px;padding:12px;font-size:.9rem}
+footer{text-align:center;color:#637267;font-size:.8rem;padding:10px 20px 30px}
+@media(max-width:480px){.grid{grid-template-columns:1fr}main{padding:12px}}
+</style>
+</head>
+<body>
+<header><h1>🌐 Marathi2India AI Translator</h1><p>मराठीमधून इंग्रजी आणि भारतीय भाषांमध्ये भाषांतर</p></header>
+<main>
+<section class="card">
+<div class="grid">
+<div><label for="source">मूळ भाषा</label><select id="source"><option value="mar_Deva">मराठी</option></select></div>
+<div><label for="target">भाषांतराची भाषा</label><select id="target"></select></div>
+</div>
+<label for="input" style="margin-top:14px">मराठी मजकूर / आवाजातून आलेला मजकूर</label>
+<textarea id="input" placeholder="इथे मराठीत लिहा किंवा माइक वापरा…"></textarea>
+<div class="row">
+<button class="secondary" id="mic">🎙️ बोलून लिहा</button>
+<button class="secondary" id="stop" disabled>⏹ थांबवा</button>
+<button class="secondary" id="clear">मजकूर पुसा</button>
+</div>
+<button class="primary" id="translate">भाषांतर करा</button>
+<div id="status" role="status">भाषांतर सेवा जोडण्यासाठी सेटअप सूचना वाचा.</div>
+<p class="small">आवाज ओळखण्याची सुविधा Chrome आणि डिव्हाइसच्या उपलब्धतेवर अवलंबून आहे. रेकॉर्डिंग १–२ मिनिटांपर्यंत वापरता येईल; माइक परवानगी द्यावी लागेल.</p>
+</section>
+<section class="card">
+<label for="output">भाषांतराचा निकाल</label>
+<textarea id="output" readonly placeholder="भाषांतर इथे दिसेल…"></textarea>
+<div class="row">
+<button class="secondary" id="copy">📋 निकाल कॉपी करा</button>
+<button class="secondary" id="speak">🔊 मोठ्याने वाचा</button>
+</div>
+</section>
+<section class="card">
+<label>Professional English सुधारणा</label>
+<p class="small">ही सुविधा इंग्रजी निकालावर वापरा. खालील बटणासाठी तुमच्या भाषांतर/API सर्व्हरमध्ये grammar-correction सुविधा जोडणे आवश्यक आहे.</p>
+<button class="secondary" id="polish" style="width:100%">English grammar आणि style सुधारा</button>
+</section>
+<div class="notice"><strong>सेवा जोडणे आवश्यक आहे:</strong> या पॅकेजमध्ये ॲपची स्क्रीन, भाषा निवड, आवाज इनपुट आणि PWA फाइल्स आहेत. अचूक AI भाषांतर सुरू करण्यासाठी IndicTrans2 किंवा Bhashini सारख्या सेवेसाठी सर्व्हर/API जोडणे आवश्यक आहे. API key थेट या HTML फाइलमध्ये ठेवू नका.</div>
+</main>
+<footer>Marathi2India AI Translator · पहिली PWA आवृत्ती</footer>
+<script>
+const languages = [
+["मराठी","mar_Deva"],["English","eng_Latn"],["हिंदी","hin_Deva"],["বাংলা / बंगाली","ben_Beng"],
+["ગુજરાતી / गुजराती","guj_Gujr"],["ਪੰਜਾਬੀ / पंजाबी","pan_Guru"],["অসমীয়া / आसामी","asm_Beng"],
+["ಕನ್ನಡ / कन्नड","kan_Knda"],["മലയാളം / मल्याळम","mal_Mlym"],["தமிழ் / तमिळ","tam_Taml"],
+["తెలుగు / तेलुगू","tel_Telu"],["ଓଡ଼ିଆ / ओडिया","ory_Orya"],["संस्कृत","san_Deva"],
+["नेपाली","npi_Deva"],["मैथिली","mai_Deva"],["कोंकणी","gom_Deva"],["बोडो","brx_Deva"],
+["डोगरी","doi_Deva"],["काश्मिरी (देवनागरी)","kas_Deva"],["काश्मिरी (अरबी लिपी)","kas_Arab"],
+["मणिपुरी (बंगाली लिपी)","mni_Beng"],["मणिपुरी (मैतेई लिपी)","mni_Mtei"],["संथाली","sat_Olck"],
+["सिंधी (अरबी लिपी)","snd_Arab"],["सिंधी (देवनागरी)","snd_Deva"],["उर्दू","urd_Arab"]
+];
+const target=document.getElementById('target');
+languages.filter(x=>x[1]!=="mar_Deva").forEach(([name,code])=>{let o=document.createElement('option');o.value=code;o.textContent=name;target.appendChild(o)});
+target.value="eng_Latn";
+const $=id=>document.getElementById(id), status=$('status');
+$('translate').addEventListener('click', async()=>{
+ const text=$('input').value.trim(); if(!text){status.textContent="कृपया आधी मजकूर लिहा किंवा माइकने बोला.";return}
+ // Replace this URL with YOUR secured backend endpoint after deployment.
+ const API_URL="";
+ if(!API_URL){status.textContent="भाषांतर API अजून जोडलेली नाही. खालील README मधील API सेटअप पूर्ण करा. मजकूर पाठवलेला नाही.";return}
+ status.textContent="भाषांतर सुरू आहे…";
+ try{
+  const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,source:$('source').value,target:target.value})});
+  if(!r.ok)throw new Error("API status "+r.status);
+  const data=await r.json(); $('output').value=data.translation||data.translatedText||"API कडून भाषांतर मिळाले नाही.";
+  status.textContent="भाषांतर पूर्ण.";
+ }catch(e){status.textContent="भाषांतर अयशस्वी: "+e.message}
+});
+$('clear').onclick=()=>{$('input').value='';$('output').value='';status.textContent='मजकूर पुसला.'};
+$('copy').onclick=async()=>{if(!$('output').value){status.textContent='कॉपी करण्यासाठी निकाल नाही.';return}try{await navigator.clipboard.writeText($('output').value);status.textContent='निकाल कॉपी झाला.'}catch(e){$('output').select();status.textContent='निकाल निवडला आहे; Copy वापरा.'}};
+$('speak').onclick=()=>{let t=$('output').value;if(!t)return;let u=new SpeechSynthesisUtterance(t);let code=target.value.split('_')[0];const map={eng:'en-IN',hin:'hi-IN',mar:'mr-IN',tam:'ta-IN',tel:'te-IN',kan:'kn-IN',mal:'ml-IN',ben:'bn-IN',guj:'gu-IN',pan:'pa-IN',urd:'ur-IN'};u.lang=map[code]||'hi-IN';speechSynthesis.cancel();speechSynthesis.speak(u)};
+$('polish').onclick=()=>{status.textContent="Professional English साठी API मध्ये स्वतंत्र सुधारणा endpoint जोडणे आवश्यक आहे. सध्या कोणताही मजकूर बदललेला नाही."};
+let recognition=null,timer=null;
+$('mic').onclick=()=>{
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){status.textContent="या Chrome/डिव्हाइसवर Speech Recognition उपलब्ध नाही. Gboard माइक वापरून मजकूर भरून पाहा.";return}
+ recognition=new SR();recognition.lang='mr-IN';recognition.continuous=true;recognition.interimResults=true;
+ let finalText=$('input').value;recognition.onresult=e=>{let interim='';for(let i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)finalText+=e.results[i][0].transcript;else interim+=e.results[i][0].transcript}$('input').value=(finalText+' '+interim).trim()};
+ recognition.onerror=e=>status.textContent='माइक त्रुटी: '+e.error;
+ recognition.onend=()=>{ $('mic').disabled=false;$('stop').disabled=true;clearTimeout(timer);status.textContent='आवाज इनपुट थांबला.'};
+ try{recognition.start();$('mic').disabled=true;$('stop').disabled=false;status.textContent='मराठीत बोला. १ मिनिट ५० सेकंदांनी आपोआप थांबेल.';timer=setTimeout(()=>{try{recognition.stop()}catch(e){}},110000)}catch(e){status.textContent='माइक सुरू करता आला नाही. पुन्हा प्रयत्न करा.'}
+};
+$('stop').onclick=()=>{if(recognition)recognition.stop()};
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body>
+</html>
